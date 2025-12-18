@@ -20,7 +20,8 @@ export class AuthService {
     }
 
     registerDto.password = bcrypt.hashSync(registerDto.password, 8);
-    return await this.userService.createUser(registerDto);
+    const userEntity = await this.userService.createUser(registerDto);
+    return { user: userEntity };
   }
 
   async login(loginDto: LoginDto) {
