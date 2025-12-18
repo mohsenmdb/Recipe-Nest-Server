@@ -5,6 +5,7 @@ export class RegisterDto {
     first_name: string;
     @IsNotEmpty()
     last_name: string;
+    @IsNotEmpty()
     @IsEmail()
     email: string;
     @IsOptional()
