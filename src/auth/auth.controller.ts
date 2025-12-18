@@ -6,12 +6,13 @@ import { RegisterDto } from './dto/register.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Post('/register')
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
+  }
+
   @Post('/login')
   login(@Body() createAuthDto: RegisterDto) {
-    return this.authService.register(createAuthDto);
-  }
-  @Post('/register')
-  register(@Body() createAuthDto: RegisterDto) {
     return this.authService.login(createAuthDto);
   }
 }

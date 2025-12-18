@@ -9,7 +9,7 @@ export default class User {
     email: string
 
     @Column({length: 25, nullable: true})
-    firs_name: string
+    first_name: string
 
     @Column({length: 25, nullable: true})
     last_name: string
