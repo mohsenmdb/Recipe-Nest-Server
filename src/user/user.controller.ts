@@ -10,6 +10,7 @@ export class UserController {
   @Get()
   @UseGuards(JwtAuthGuard)
   async profile(@Request() req: UserGuards) {
+    console.log('user req.id', req.id)
     const user = await this.userService.findOneById(req.id);
     if (!user) {
       throw new HttpException('User not found', 404);

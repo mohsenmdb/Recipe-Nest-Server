@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, Request  } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import UserGuards from 'src/user/dto/userGuards';
 
 @Controller('recipes')
 export class RecipesController {
@@ -10,7 +14,26 @@ export class RecipesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createRecipeDto: CreateRecipeDto) {
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/products',
+        filename: (req, file, cb) => {
+          const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueName + extname(file.originalname));
+        },
+      }),
+    }),
+  )
+  create(
+    @Body() createRecipeDto: CreateRecipeDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: UserGuards
+  ) {
+    createRecipeDto.user = req;
+    createRecipeDto.image = file?.filename;
+    console.log('user email', req.email)
+    // console.log('create recipe by createRecipeDto:', createRecipeDto);
     return this.recipesService.create(createRecipeDto);
   }
 
