@@ -7,6 +7,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import UserGuards from 'src/user/dto/userGuards';
+import { UserReq } from 'src/auth/jwt/jwt.user';
 
 @Controller('recipes')
 export class RecipesController {
@@ -17,7 +18,7 @@ export class RecipesController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: './uploads/products',
+        destination: './uploads/recipes',
         filename: (req, file, cb) => {
           const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, uniqueName + extname(file.originalname));
@@ -28,7 +29,7 @@ export class RecipesController {
   create(
     @Body() createRecipeDto: CreateRecipeDto,
     @UploadedFile() file: Express.Multer.File,
-    @Request() req: UserGuards
+    @UserReq() req: UserGuards
   ) {
     createRecipeDto.user = req;
     createRecipeDto.image = file?.filename;
