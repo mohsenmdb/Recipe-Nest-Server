@@ -33,8 +33,7 @@ export class RecipesController {
   ) {
     createRecipeDto.user = req;
     createRecipeDto.image = file?.filename;
-    console.log('user email', req.email)
-    // console.log('create recipe by createRecipeDto:', createRecipeDto);
+    console.log('create recipe by createRecipeDto:', createRecipeDto);
     return this.recipesService.create(createRecipeDto);
   }
 
