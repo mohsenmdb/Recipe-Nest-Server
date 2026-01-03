@@ -4,6 +4,8 @@ import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import Recipe from './entities/recipe.entity';
 import { Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import e from 'express';
 
 @Injectable()
 export class RecipesService {
@@ -11,11 +13,24 @@ export class RecipesService {
   constructor(
     @InjectRepository(Recipe)
     private readonly recipeRepository: Repository<Recipe>,
+    private readonly userService: UserService,
   ) { }
 
   async create(createRecipeDto: CreateRecipeDto) {
-    const recipe = this.recipeRepository.create(createRecipeDto)
+    const userName = await this.getUserName(createRecipeDto?.user?.id);
+    console.log(`userName = ${userName}`);
+    const recipe = this.recipeRepository.create(createRecipeDto);
     return await this.recipeRepository.save(recipe);
+  }
+
+  async getUserName(userId: number) {
+    if (userId) {
+      const user = await this.userService.findOneById(userId);
+      if (!user) throw new HttpException('User not found', 404);
+      return user.first_name + '.' + user.last_name;
+    } else {
+      throw new HttpException('Authentication Error', 400);
+    }
   }
 
   findAll() {
