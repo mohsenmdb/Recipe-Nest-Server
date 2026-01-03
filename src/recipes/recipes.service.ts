@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -42,12 +42,33 @@ export class RecipesService {
     }
   }
 
-  findAll() {
-    return `This action returns all recipes`;
+  async findAllPaginated(page = 1, pageSize = 10) {
+    const skip = (page - 1) * pageSize;
+
+    const [items, total] = await this.recipeRepository.findAndCount({
+      skip,
+      take: pageSize,
+      order: { id: 'DESC' },
+    });
+
+    return {
+      items: items,
+      meta: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recipe`;
+  async findOne(id: number) {
+    const recipe = await this.recipeRepository.findOne({ where: { id } });
+
+    if (!recipe) {
+      throw new NotFoundException(`Recipe with id ${id} not found`);
+    }
+    return recipe;
   }
 
   update(id: number, updateRecipeDto: UpdateRecipeDto) {
