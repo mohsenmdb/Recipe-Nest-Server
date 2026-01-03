@@ -1,5 +1,4 @@
-import User from "src/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('recipe')
 export default class Recipe {
@@ -9,20 +8,20 @@ export default class Recipe {
     @Column({ nullable: false })
     title: string
 
-    @Column({ length: 10, nullable: false })
+    @Column({ nullable: false })
     description: string
 
     @Column({ nullable: false })
     ingredients: string
 
-    // @Column({ nullable: true })
-    // rating: number
+    @Column({ nullable: true, default: 0 })
+    rating: number
 
-    // @CreateDateColumn()
-    // createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-    // @UpdateDateColumn()
-    // updatedAt: Date;
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @Column({ nullable: true })
     image: string;
@@ -31,5 +30,5 @@ export default class Recipe {
     user_name: string;
 
     @Column({ nullable: false })
-    user_id: string
+    user_id: number
 }

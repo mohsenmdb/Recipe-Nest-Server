@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import Recipe from './entities/recipe.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
-import e from 'express';
 
 @Injectable()
 export class RecipesService {
@@ -17,9 +16,19 @@ export class RecipesService {
   ) { }
 
   async create(createRecipeDto: CreateRecipeDto) {
-    const userName = await this.getUserName(createRecipeDto?.user?.id);
-    console.log(`userName = ${userName}`);
-    const recipe = this.recipeRepository.create(createRecipeDto);
+    const userId = createRecipeDto?.user?.id;
+    const userName = await this.getUserName(userId);
+    console.log(`userName = ${userName}, userId = ${userId}`);
+
+    const recipe = this.recipeRepository.create({
+      title: createRecipeDto.title,
+      description: createRecipeDto.description,
+      ingredients: createRecipeDto.ingredients,
+      image: createRecipeDto.image,
+      user_id: userId,
+      user_name: userName,
+    });
+
     return await this.recipeRepository.save(recipe);
   }
 
