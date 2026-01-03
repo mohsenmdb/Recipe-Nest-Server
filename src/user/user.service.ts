@@ -23,6 +23,7 @@ export class UserService {
   }
 
   findOneById = async (id: number) => {
+    if (!id) return null;
     return await this.userRepository.findOneBy({ id: id });
   }
 
