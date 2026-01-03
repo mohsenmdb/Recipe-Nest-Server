@@ -28,5 +28,8 @@ export default class Recipe {
     image: string;
 
     @Column({ nullable: false })
-    user_name: string
+    user_name: string;
+
+    @Column({ nullable: false })
+    user_id: string
 }
