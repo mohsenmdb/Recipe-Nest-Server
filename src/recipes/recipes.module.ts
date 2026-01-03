@@ -12,4 +12,4 @@ import User from 'src/user/entities/user.entity';
   controllers: [RecipesController],
   providers: [RecipesService, UserService],
 })
-export class RecipesModule {}
+export class RecipesModule { }

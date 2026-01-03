@@ -18,8 +18,6 @@ export class RecipesService {
   async create(createRecipeDto: CreateRecipeDto) {
     const userId = createRecipeDto?.user?.id;
     const userName = await this.getUserName(userId);
-    console.log(`userName = ${userName}, userId = ${userId}`);
-
     const recipe = this.recipeRepository.create({
       title: createRecipeDto.title,
       description: createRecipeDto.description,
@@ -44,15 +42,12 @@ export class RecipesService {
 
   async findAllPaginated(page = 1, pageSize = 10) {
     const skip = (page - 1) * pageSize;
-
-    const [items, total] = await this.recipeRepository.findAndCount({
-      skip,
-      take: pageSize,
-      order: { id: 'DESC' },
-    });
-
+    const [items, total] = await this.recipeRepository.findAndCount(
+      { skip, take: pageSize, order: { id: 'DESC' } }
+    );
+    const recipes = items.map(recipe => this.withImagePath(recipe));
     return {
-      items: items,
+      recipes: recipes,
       meta: {
         page,
         pageSize,
@@ -68,7 +63,16 @@ export class RecipesService {
     if (!recipe) {
       throw new NotFoundException(`Recipe with id ${id} not found`);
     }
-    return recipe;
+    return this.withImagePath(recipe);
+  }
+
+  private withImagePath(entity: Recipe) {
+    return {
+      ...entity,
+      image: entity.image
+        ? `${process.env.UPLOADS_IMAGES_PATH}${entity.image}`
+        : entity.image,
+    };
   }
 
   async update(id: number, updateRecipeDto: UpdateRecipeDto) {

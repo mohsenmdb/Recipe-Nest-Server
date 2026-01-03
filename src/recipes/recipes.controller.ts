@@ -63,7 +63,7 @@ export class RecipesController {
     }),
   )
   update(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Body() updateRecipeDto: UpdateRecipeDto,
     @UploadedFile() file: Express.Multer.File,
     @UserReq() req: UserGuards
