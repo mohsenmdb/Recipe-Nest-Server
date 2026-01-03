@@ -50,12 +50,32 @@ export class RecipesController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/recipes',
+        filename: (req, file, cb) => {
+          const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueName + extname(file.originalname));
+        },
+      }),
+    }),
+  )
+  update(
+    @Param('id') id: string, 
+    @Body() updateRecipeDto: UpdateRecipeDto,
+    @UploadedFile() file: Express.Multer.File,
+    @UserReq() req: UserGuards
+  ) {
+    updateRecipeDto.user = req;
+    updateRecipeDto.image = file?.filename;
     return this.recipesService.update(+id, updateRecipeDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recipesService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  remove(@Param('id') id: string, @UserReq() req: UserGuards) {
+    return this.recipesService.remove(+id, req.id);
   }
 }

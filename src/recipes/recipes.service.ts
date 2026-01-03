@@ -71,11 +71,28 @@ export class RecipesService {
     return recipe;
   }
 
-  update(id: number, updateRecipeDto: UpdateRecipeDto) {
-    return `This action updates a #${id} recipe`;
+  async update(id: number, updateRecipeDto: UpdateRecipeDto) {
+    const userId = updateRecipeDto?.user?.id;
+    const product = await this.recipeRepository.update(
+      { id, user_id: userId },
+      {
+        title: updateRecipeDto.title,
+        description: updateRecipeDto.description,
+        ingredients: updateRecipeDto.ingredients,
+        image: updateRecipeDto.image,
+      }
+    );
+    if (product.affected === 0) {
+      throw new HttpException('Product not found', 404);
+    }
+    return product;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} recipe`;
+  async remove(id: number, userId: number) {
+    const checkedRecipe = await this.recipeRepository.findOne({ where: { id, user_id: userId } });
+    if (!checkedRecipe) {
+      throw new HttpException('Recipe not found or you are not authorized to update this recipe', 404);
+    }
+    return await this.recipeRepository.delete(id);
   }
 }
