@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import Recipe from './entities/recipe.entity';
 import { Like, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
+import UserGuards from 'src/user/dto/userGuards';
 
 @Injectable()
 export class RecipesService {
@@ -16,18 +17,7 @@ export class RecipesService {
   ) { }
 
   async create(createRecipeDto: CreateRecipeDto) {
-    const userId = createRecipeDto?.user?.id;
-    const userName = await this.getUserName(userId);
-    const recipe = this.recipeRepository.create({
-      title: createRecipeDto.title,
-      description: createRecipeDto.description,
-      ingredients: createRecipeDto.ingredients,
-      image: createRecipeDto.image,
-      user_id: userId,
-      user_name: userName,
-    });
-
-    return await this.recipeRepository.save(recipe);
+    return await this.recipeRepository.save(createRecipeDto);
   }
 
   async getUserName(userId: number) {
@@ -39,7 +29,7 @@ export class RecipesService {
       throw new HttpException('Authentication Error', 400);
     }
   }
-  
+
   async findAllPaginated(page = 1, pageSize: number = 10, query: string) {
     const skip = (page - 1) * pageSize;
     const where = query ? [
@@ -86,9 +76,8 @@ export class RecipesService {
   }
 
   async update(id: number, updateRecipeDto: UpdateRecipeDto) {
-    const userId = updateRecipeDto?.user?.id;
     const product = await this.recipeRepository.update(
-      { id, user_id: userId },
+      { id, user: updateRecipeDto?.user },
       {
         title: updateRecipeDto.title,
         description: updateRecipeDto.description,
@@ -102,8 +91,8 @@ export class RecipesService {
     return product;
   }
 
-  async remove(id: number, userId: number) {
-    const checkedRecipe = await this.recipeRepository.findOne({ where: { id, user_id: userId } });
+  async remove(id: number, user: UserGuards) {
+    const checkedRecipe = await this.recipeRepository.findOne({ where: { id, user } });
     if (!checkedRecipe) {
       throw new HttpException('Recipe not found or you are not authorized to update this recipe', 404);
     }
