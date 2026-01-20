@@ -3,7 +3,7 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import Recipe from './entities/recipe.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -39,12 +39,22 @@ export class RecipesService {
       throw new HttpException('Authentication Error', 400);
     }
   }
-
-  async findAllPaginated(page = 1, pageSize = 10) {
+  
+  async findAllPaginated(page = 1, pageSize: number = 10, query: string) {
     const skip = (page - 1) * pageSize;
-    const [items, total] = await this.recipeRepository.findAndCount(
-      { skip, take: pageSize, order: { id: 'DESC' } }
-    );
+    const where = query ? [
+      { title: Like(`%${query}%`) },
+      { description: Like(`%${query}%`) },
+      { ingredients: Like(`%${query}%`) }
+    ] : {};
+
+    const [items, total] = await this.recipeRepository.findAndCount({
+      where,
+      skip,
+      take: pageSize,
+      order: { id: 'DESC' }
+    });
+
     const recipes = items.map(recipe => this.withImagePath(recipe));
     return {
       recipes: recipes,

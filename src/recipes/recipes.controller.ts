@@ -40,8 +40,9 @@ export class RecipesController {
   findAll(
     @Query('page') page = '1',
     @Query('pageSize') pageSize = '10',
+    @Query('query') query: string,
   ) {
-    return this.recipesService.findAllPaginated(+page, +pageSize);
+    return this.recipesService.findAllPaginated(+page, +pageSize, query);
   }
 
   @Get(':id')
