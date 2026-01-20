@@ -27,10 +27,10 @@ export default class Recipe {
     @Column({ nullable: true })
     image: string;
 
-  @ManyToOne(() => User, user => user.recipes, { 
-    nullable: false,
-    eager: true // Optional: if you want user data always loaded
-  })
-  @JoinColumn({ name: 'user' }) // Specify column name
-  user: User;
+    @ManyToOne(() => User, user => user.recipes, {
+        nullable: false,
+        eager: true // Optional: if you want user data always loaded
+    })
+    @JoinColumn({ name: 'user' }) // Specify column name
+    user: User;
 }
