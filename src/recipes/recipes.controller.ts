@@ -28,11 +28,11 @@ export class RecipesController {
   )
   create(
     @Body() createRecipeDto: CreateRecipeDto,
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
     @UserReq() req: UserGuards
   ) {
     createRecipeDto.user = req;
-    createRecipeDto.image = file?.filename;
+    createRecipeDto.image = "1767447542192-446803202.png";
     return this.recipesService.create(createRecipeDto);
   }
 
@@ -45,9 +45,14 @@ export class RecipesController {
     return this.recipesService.findAllPaginated(+page, +pageSize, query);
   }
 
-  @Get(':id')
+  @Get('/one/:id')
   findOne(@Param('id') id: string) {
     return this.recipesService.findOne(+id);
+  }
+
+  @Get('/categories')
+  categories() {
+    return this.recipesService.categories();
   }
 
   @Put(':id')
