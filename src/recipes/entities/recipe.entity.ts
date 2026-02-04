@@ -1,5 +1,6 @@
 import User from "src/user/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate } from "typeorm";
+import { Expose, Transform } from 'class-transformer';
 
 @Entity('recipe')
 export default class Recipe {
@@ -18,11 +19,31 @@ export default class Recipe {
     @Column({ nullable: true, default: 0 })
     rating: number
 
-    @CreateDateColumn()
-    createdAt: Date;
+    @Column({ 
+        type: 'bigint',
+        nullable: false,
+        default: () => 'EXTRACT(EPOCH FROM NOW())::bigint'
+    })
+    createdAt: number;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+    @Column({ 
+        type: 'bigint',
+        nullable: false,
+        default: () => 'EXTRACT(EPOCH FROM NOW())::bigint'
+    })
+    updatedAt: number;
+
+    @BeforeInsert()
+    setTimestampsOnInsert() {
+        const timestamp = Math.floor(Date.now() / 1000);
+        this.createdAt = timestamp;
+        this.updatedAt = timestamp;
+    }
+
+    @BeforeUpdate()
+    setTimestampOnUpdate() {
+        this.updatedAt = Math.floor(Date.now() / 1000);
+    }
 
     @Column({ nullable: true })
     image: string;
