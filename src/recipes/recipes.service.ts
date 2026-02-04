@@ -58,28 +58,36 @@ export class RecipesService {
   }
 
   async categories() {
+    const slider = await this.fetchQuery('SLIDER')
     const milk = await this.fetchQuery('MILK')
     const beef = await this.fetchQuery('BEEF')
     const pasta = await this.fetchQuery('PASTA')
     const water = await this.fetchQuery('WATER')
-    return [milk, pasta, beef, water];
+    return [slider, milk, pasta, beef, water];
   }
+async fetchQuery(query: string, pageSize: number = 5) {
+  const where =
+    query === 'SLIDER'
+      ? undefined
+      : [
+          { title: Like(`%${query.toLowerCase()}%`) },
+          { description: Like(`%${query.toLowerCase()}%`) },
+          { ingredients: Like(`%${query.toLowerCase()}%`) }
+        ];
 
-  async fetchQuery(query: string, pageSize: number = 5) {
-    const where = [
-      { title: Like(`%${query.toLowerCase()}%`) },
-      { description: Like(`%${query.toLowerCase()}%`) },
-      { ingredients: Like(`%${query.toLowerCase()}%`) }
-    ];
+  const [items] = await this.recipeRepository.findAndCount({
+    ...(where && { where }),
+    take: pageSize,
+    order: { id: 'DESC' }
+  });
 
-    const [items, total] = await this.recipeRepository.findAndCount({
-      where,
-      take: pageSize,
-      order: { id: 'DESC' }
-    });
-    const recipes = items.map(recipe => this.withImagePath(recipe));
-    return { category: query , recipes: recipes};
-  }
+  return {
+    type: query === 'SLIDER' ? 'SLIDER' : 'ROW',
+    category: query === 'SLIDER' ? 'ALL' : query,
+    recipes: items.map(recipe => this.withImagePath(recipe))
+  };
+}
+
 
   async findOne(id: number) {
     const recipe = await this.recipeRepository.findOne({ where: { id } });
@@ -107,6 +115,7 @@ export class RecipesService {
         description: updateRecipeDto.description,
         ingredients: updateRecipeDto.ingredients,
         image: updateRecipeDto.image,
+        updatedAt: Math.floor(Date.now() / 1000)
       }
     );
     if (product.affected === 0) {
