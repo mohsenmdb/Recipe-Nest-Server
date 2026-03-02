@@ -7,7 +7,7 @@ export default class User {
     id: number
 
     @Column({ unique: true, nullable: false })
-    email: string
+    username: string
 
     @Column({ length: 25, nullable: true })
     first_name: string

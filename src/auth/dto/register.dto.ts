@@ -2,8 +2,7 @@ import { IsEmail, IsNotEmpty, IsOptional } from "class-validator";
 
 export class RegisterDto {
     @IsNotEmpty()
-    @IsEmail()
-    email: string;
+    username: string;
 
     @IsNotEmpty()
     first_name: string;

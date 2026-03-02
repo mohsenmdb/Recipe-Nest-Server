@@ -27,14 +27,14 @@ export class UserService {
     return await this.userRepository.findOneBy({ id: id });
   }
 
-  findOneByEmail = async (email: string) => {
-    return await this.userRepository.findOne({ where: { email: email } });
+  findOneByUsername = async (username: string) => {
+    return await this.userRepository.findOne({ where: { username: username } });
   }
 
-  findOneByEmailWithPassword = async (email: string) => {
+  findOneByUsernameWithPassword = async (username: string) => {
     return await this.userRepository.findOne({
-      where: { email: email }
-      , select: ['id', 'first_name', 'last_name', 'email', 'password']
+      where: { username: username }
+      , select: ['id', 'first_name', 'last_name', 'username', 'age', 'password']
     });
   }
 }
