@@ -28,11 +28,11 @@ export class RecipesController {
   )
   create(
     @Body() createRecipeDto: CreateRecipeDto,
-    // @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
     @UserReq() req: UserGuards
   ) {
     createRecipeDto.user = req;
-    createRecipeDto.image = "1767447542192-446803202.png";
+    createRecipeDto.image = file?.filename;
     return this.recipesService.create(createRecipeDto);
   }
 
