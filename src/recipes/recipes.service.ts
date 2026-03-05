@@ -3,7 +3,7 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import Recipe from './entities/recipe.entity';
-import { Like, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import UserGuards from 'src/user/dto/userGuards';
 
@@ -33,9 +33,9 @@ export class RecipesService {
   async findAllPaginated(page = 1, pageSize: number = 10, query: string) {
     const skip = (page - 1) * pageSize;
     const where = query ? [
-      { title: Like(`%${query}%`) },
-      { description: Like(`%${query}%`) },
-      { ingredients: Like(`%${query}%`) }
+      { title: ILike(`%${query}%`) },
+      { description: ILike(`%${query}%`) },
+      { ingredients: ILike(`%${query}%`) }
     ] : {};
 
     const [items, total] = await this.recipeRepository.findAndCount({
@@ -70,9 +70,9 @@ async fetchQuery(query: string, pageSize: number = 5) {
     query === 'SLIDER'
       ? undefined
       : [
-          { title: Like(`%${query.toLowerCase()}%`) },
-          { description: Like(`%${query.toLowerCase()}%`) },
-          { ingredients: Like(`%${query.toLowerCase()}%`) }
+          { title: ILike(`%${query.toLowerCase()}%`) },
+          { description: ILike(`%${query.toLowerCase()}%`) },
+          { ingredients: ILike(`%${query.toLowerCase()}%`) }
         ];
 
   const [items] = await this.recipeRepository.findAndCount({
